@@ -1,0 +1,70 @@
+defaults: &defaults
+  working_directory: ~/service
+  docker:
+    - image: circleci/ruby:2.5.1
+      environment:
+        BUNDLE_JOBS: 4
+        BUNDLE_RETRY: 3
+        BUNDLE_PATH: vendor/bundle
+        PGHOST: 127.0.0.1
+        PGUSER: service-circleci-test
+        DATABASE_URL: postgresql://localhost/service_test
+    - image: circleci/postgres:9.6-alpine
+      environment:
+        POSTGRES_DB: service_test
+        POSTGRES_USER: service-circleci-test
+        POSTGRES_PASSWORD: service-circleci-test
+  environment:
+    TZ: "/usr/share/zoneinfo/America/Houston"
+    RAILS_ENV: test
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - service-build-{{ checksum "Gemfile.lock" }}
+            - service-build-
+      - run:
+          name: Bundle install
+          command: bundle install
+      - save_cache:
+          paths:
+            - ~/service/vendor/bundle
+          key: service-build-{{ checksum "Gemfile.lock" }}
+      - persist_to_workspace:
+          root: vendor
+          paths:
+            - bundle
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/service/vendor
+      - run:
+          name: Installing postgresql client
+          command: |
+            sudo apt-get update
+            sudo apt-get install postgresql-client
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Database setup
+          command: |
+            bundle exec rake db:create
+            bundle exec rake db:load
+      - run:
+          name: Run main app tests
+          command: bundle exec rake test
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
