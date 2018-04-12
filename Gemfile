@@ -10,12 +10,12 @@ gem "rake"
 gem "roda", "~> 3.6.0"
 gem "sequel"
 gem "sequel_pg", require: "sequel"
+gem "rack-unreloader"
 
 group :test, :development do
   gem "dotenv"
   gem "pry"
   gem "pry-byebug"
-  gem "rack-unreloader"
 end
 
 group :test do

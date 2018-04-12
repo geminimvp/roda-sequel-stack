@@ -3,7 +3,6 @@
 require "yaml"
 require "erb"
 
-if ENV["RACK_ENV"] == "development" && !defined?(Unreloader)
   require "rack/unreloader"
   Unreloader = Rack::Unreloader.new(reload: false)
 end
@@ -19,6 +18,13 @@ DB = Sequel.connect(settings)
 DB.extension :pg_json
 
 Sequel::Model.plugin :json_serializer
+
+unless defined?(Unreloader)
+  require 'rack/unreloader'
+  Unreloader = Rack::Unreloader.new(reload: false)
+end
+
+Unreloader.require('lib/models'){|f| Sequel::Model.send(:camelize, File.basename(f).sub(/\.rb\z/, ''))}
 
 # require "lib/models/user"
 # require "lib/models/event"
