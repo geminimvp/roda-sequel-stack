@@ -13,7 +13,7 @@ namespace :db do
 
   desc "Run all migrations in migrate"
   task :migrate do
-    require_relative "../../models"
+    require_relative "../../db"
     Sequel.extension(:migration)
     Sequel::Migrator.apply(DB, "migrate")
   end
