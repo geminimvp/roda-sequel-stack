@@ -1,6 +1,6 @@
 # App Template
 
-Apptegy micro service template
+Roda sequel stack for micro services
 
 ## Console
 
@@ -18,7 +18,11 @@ Apptegy micro service template
 
 ## Run Server
 
-### Development
+```
+  rackup config.ru
+```
+
+### or
 
 ```
   foreman start
