@@ -4,6 +4,7 @@ require "bundler"
 Bundler.require
 require "./models"
 
+# AppService roda application for microservice
 class AppService < Roda
   plugin :default_headers, "Content-Type" => "application/json; charset=utf-8"
   plugin :halt

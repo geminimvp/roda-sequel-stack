@@ -16,7 +16,7 @@ defaults: &defaults
         POSTGRES_PASSWORD: service-circleci-test
   environment:
     TZ: "/usr/share/zoneinfo/America/Houston"
-    RAILS_ENV: test
+    RACK_ENV: test
 version: 2
 jobs:
   build:
@@ -60,6 +60,15 @@ jobs:
       - run:
           name: Run main app tests
           command: bundle exec rake test
+  rubocop:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/service/vendor
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop
 workflows:
   version: 2
   workflow:
@@ -68,3 +77,6 @@ workflows:
       - test:
           requires:
             - build
+      - rubocop:
+          requires:
+            - test

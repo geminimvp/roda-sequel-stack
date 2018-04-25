@@ -28,11 +28,17 @@ namespace :db do
     `psql #{pg_options} --file structure.sql`
   end
 
+  desc "Create database structure from migrations"
+  task bootstrap: %i[create migrate]
+
+  desc "Reset database structure from migrations"
+  task reset: %i[drop bootstrap]
+
   private
 
   def pg_options
-    out = "#{settings['database']} --host #{settings['host']} --port #{settings['port']}"
-    out << "--username #{settings['username']}" if settings["username"]
+    out = "#{settings["database"]} --host #{settings["host"]} --port #{settings["port"]}"
+    out << "--username #{settings["username"]}" if settings["username"]
     out
   end
 

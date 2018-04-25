@@ -1,0 +1,3 @@
+inherit_from:
+  - https://s3.amazonaws.com/sv3-style/rubocop.yml
+  - .rubocop_todo.yml
